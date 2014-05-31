@@ -51,3 +51,7 @@ subset = selector.select(int(sys.argv[3]))
 
 #Persist the subset
 print subset
+
+with open(sys.argv[4], 'w+') as f:
+    for pair in subset:
+        f.write(str(pair) + '\n')
