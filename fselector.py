@@ -4,34 +4,47 @@ Features Selector
 
 from chisquared import ChiSquared
 from mutualinfo import MutualInfo
+import thread
+import threading
 
 class FeatureSelector(object):
 
     _supported = {'chi_squared': ChiSquared,
                   'mutual_inf': MutualInfo}
 
-    def __init__(self, technique, set, tvalue):  # pylint: disable=E1002
+    def __init__(self, technique, id):  # pylint: disable=E1002
 
-        self._tvalue = tvalue
-        self._target = 'target'
+        self._id = id
         
         #fail if wrong argument
         if technique not in self._supported.keys():
             raise ValueError("The technique must be one of" + str(self._supported.keys()))
         
-        self._metric = self._supported[technique](set)
+        self._metric = self._supported[technique]()
         self._dataSet = set
     
 	# run selection
     def select(self, k):
-        featureSet = []
-        
-        for att in range(1, len(self._dataSet.parameters)):
-            featureSet.append((self._dataSet.parameters[att]._name, self._metric.computeMetric(att)))
+        featureSet = self._metric.select()
         
         featureSet.sort(key = lambda x : x[1])
         featureSet.reverse()
 		
 		#keep k best 
         return featureSet[0:k]
-
+		
+    def process(self, line):
+        self._metric.process(line)
+        
+    def startProcessing(self, fname):
+        #prepare the data set itself
+        event = threading.Event()
+        try:
+            thread.start_new_thread( self._metric._readFile, (fname, event, self._id, ) )
+        except Exception, e:
+            print "Error: unable to start thread" + str(e)
+        
+        return event
+    def combine(self, other):
+        self._metric.combine(other._metric)
+        return self

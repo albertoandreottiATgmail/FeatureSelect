@@ -26,27 +26,17 @@ except:
 #prepare the data set parameters
 mySet = SampleSet()
 fname = sys.argv[1]
-with open(fname) as f:
-    defined = False
-    while not defined:
-        first_line = f.readline()
-        for att_val in first_line.split():
-            att = Attribute(att_val.split(":")[0])
-            att.add("1", "0")
-            mySet.addDefinition(att)
-        defined = mySet.size() > 1
-
-#prepare the data set itself		
-with open(fname) as f:
-    line = f.readline()
-    while line:
-        mySet.addSample(line)
-        line = f.readline()
-		
 
 #print mySet.parameters		
 #select metric
-selector = FeatureSelector(sys.argv[2], mySet, '1')
+selectors = [FeatureSelector(sys.argv[2], 0), FeatureSelector(sys.argv[2], 1)]
+events = []
+for selector in selectors:
+    events.append(selector.startProcessing(fname))
+    
+map(lambda x:x.wait(), events)
+selector = reduce(lambda x, y: x.combine(y), selectors)    
+    
 subset = selector.select(int(sys.argv[3]))
 
 #Persist the subset
@@ -54,4 +44,4 @@ print subset
 
 with open(sys.argv[4], 'w+') as f:
     for pair in subset:
-        f.write(str(pair) + '\n')
+        f.write(str(pair[0]) + '\t' + str(pair[1]) + '\n')

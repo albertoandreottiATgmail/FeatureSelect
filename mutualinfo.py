@@ -7,33 +7,30 @@ from metric import Metric
 from math import log
 
 class MutualInfo(Metric):
-
-    def __init__(self, dataset):  # pylint: disable=E1002
-        self._dataSet = dataset
 		
-    def computeMetric(self, att):
-        
-        minfo = 0.0
-        epsilon = 0.00000001
-        
-        #compute mutual information between the class and this attribute
-        for value in self._dataSet.parameters[att].getValues():
-            subset = filter(lambda x: x[att] == value, self._dataSet.values)
-            probTerm = float(len(subset))/len(self._dataSet.values)
-            
-            if probTerm == 0:
-                continue
-						
-            #compute entropy
-            entropy = 0.0
-            for target in self._dataSet.parameters[0].getValues():
-                probClass = float(len(filter(lambda x: x[0] == target, self._dataSet.values)))/len(self._dataSet.values)
-                probTermClass = float(len(filter(lambda x: x[0] == target, subset)))/len(subset)
-                entropy += probTermClass * log((probTermClass + epsilon)/(probTerm * probClass),  2) 
-                    
-            #-P(B=b).H(A|B=b)
-            minfo += entropy
+    def select(self):
 
-        #do the actual choice according to minfo
-        return minfo
+        for att in self._freq.keys():
+            for target in [0,1]:
+                self._conj[att][target][0] = self._target[target] - self._conj[att][target][1]
+
+        for att in self._freq.keys():
+            self._freq[att][0] = self._N - self._freq[att][1]
+                
+        #print self._conj
+        metrics = []
+        for att in self._freq.keys():
+            metric = 0.0
+            for target in [0, 1]:
+                for attVal in [0, 1]:
+                    probTermClass = self._conj[att][target][attVal]/self._N
+                    if probTermClass == 0:
+                        continue
+                    probTerm = self._freq[att][attVal]
+                    #print str(probTermClass) + ' ' + str(probTerm)
+                    probClass = self._target[target]
+                    metric += probTermClass * log(probTermClass/(probTerm * probClass), 2)
+            metrics.append((att, metric))
+  
+        return metrics
 

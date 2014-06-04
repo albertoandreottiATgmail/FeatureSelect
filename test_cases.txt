@@ -1,0 +1,24 @@
+C:\Documents and Settings\Beto\Escritorio\FeatureSelect>python select.py poker.t
+xt mutual_inf 6 output.txt
+['select.py', 'poker.txt', 'mutual_inf', '6', 'output.txt']
+[('6', 3.41944233145553), ('2', 3.3821296111043155), ('4', 3.3810390744662655),
+('8', 3.368795439716293), ('10', 3.341316871135593), ('1', 1.8898850054158596)]
+
+C:\Documents and Settings\Beto\Escritorio\FeatureSelect>python select.py poker.t
+xt chi_squared 6 output.txt
+['select.py', 'poker.txt', 'chi_squared', '6', 'output.txt']
+[('3', 5824.701088886914), ('9', 5823.779217580379), ('7', 5787.771060861984), (
+'5', 5751.765223122765), ('1', 5677.903567775437), ('4', 1832.6249529587244)]
+
+C:\Documents and Settings\Beto\Escritorio\FeatureSelect>python select.py test3.t
+xt chi_squared 8 output.txt
+['select.py', 'test3.txt', 'chi_squared', '8', 'output.txt']
+[('4', 8.2), ('3', 8.2), ('8', 8.11111111111111), ('9', 8.11111111111111), ('6',
+ 8.11111111111111), ('7', 8.11111111111111), ('5', 8.11111111111111), ('14', 8.1
+1111111111111)]
+
+C:\DOCUME~1\Beto\ESCRIT~1\FEATUR~1>python select.py test3.txt mutual_inf 4 outpu
+t.txt
+['select.py', 'test3.txt', 'mutual_inf', '4', 'output.txt']
+[('4', -5.643856189774724), ('3', -5.643856189774724), ('8', -6.535824643629125)
+, ('9', -6.535824643629125)]

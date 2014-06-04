@@ -9,29 +9,29 @@ from math import log
 
 class ChiSquared(Metric):
     
-    def __init__(self, dataset):  # pylint: disable=E1002
-        self._dataSet = dataset
-        self._classP = {}
-        
-    def computeMetric(self, att):
-        chi2 = 0.0
-        #compute mutual information between the class and this attribute
-        for value in self._dataSet.parameters[att].getValues():
-            subsetT = filter(lambda x: x[att] == value, self._dataSet.values)
 
-            for target in self._dataSet.parameters[0].getValues():
-                subsetTC = filter(lambda x: x[0] == target, subsetT)
-                NEtEc = float(len(subsetTC))/len(self._dataSet.values)
-                
-                if target in self._classP.keys():
-				    PC = self._classP[target]
-                else:
-                    PC = float(len(filter(lambda x: x[0] == target, self._dataSet.values)))/len(self._dataSet.values)
-                # N x P(t) * P(c)
-                EEtEc = len(self._dataSet.values) * float(len(subsetT)/len(self._dataSet.values)) * PC
-                chi2 += ((NEtEc - EEtEc) * (NEtEc - EEtEc))/EEtEc
-
-        #do the actual choice according to minfo
-        return chi2
-        
-    
+    # returns [(attr, metric), (attr, metric), (attr, metric)]    
+    def select(self):
+	
+        for att in self._freq.keys():
+            for target in [0,1]:
+                self._conj[att][target][0] = self._target[target] - self._conj[att][target][1]
+            
+        metrics = []
+        for att in self._freq.keys():
+            metric = 0.0
+            for target in [0, 1]:
+                for attVal in [0, 1]:
+                  
+                    NEtEc = float(self._conj[att][target][attVal])/self._N
+                    # N x P(t) * P(c)
+                    Pt = self._conj[att][0][attVal] + self._conj[att][1][attVal]
+                    if Pt == 0:
+                        continue
+                    EEtEc = float(Pt * self._target[target])/self._N
+                    #print 'NEtEc: ' + str(NEtEc) + ' EEtEc: ' + str(EEtEc) + ' '+ str(target) + ' ' + str(attVal)
+                    metric += float((NEtEc - EEtEc) * (NEtEc - EEtEc))/EEtEc
+            metrics.append((att, metric))
+            
+        return metrics
+		
