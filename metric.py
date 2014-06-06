@@ -30,11 +30,11 @@ class Metric(object):
             while True:
                 line = f.readline()
                 if not line: break
-                if len(line) < 2: continue
+                if len(line) < 2: continue	
                 if cnt % threadNum == id:
                     self.process(line)
                 cnt += 1
-        print 'Thread ' + str(id) + ' finished'
+        print 'Thread ' + str(id) + ' finished \n'
         event.set()
     
     def __init__(self):  # pylint: disable=E1002
