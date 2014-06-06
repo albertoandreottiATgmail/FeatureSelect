@@ -12,10 +12,10 @@ class FeatureSelector(object):
     _supported = {'chi_squared': ChiSquared,
                   'mutual_inf': MutualInfo}
 
-    def __init__(self, technique, id):  # pylint: disable=E1002
+    def __init__(self, technique, id, threadNum):  # pylint: disable=E1002
 
         self._id = id
-        
+        self._threadNum = threadNum
         #fail if wrong argument
         if technique not in self._supported.keys():
             raise ValueError("The technique must be one of" + str(self._supported.keys()))
@@ -40,7 +40,7 @@ class FeatureSelector(object):
         #prepare the data set itself
         event = threading.Event()
         try:
-            thread.start_new_thread( self._metric._readFile, (fname, event, self._id, ) )
+            thread.start_new_thread( self._metric._readFile, (fname, event, self._id, self._threadNum, ) )
         except Exception, e:
             print "Error: unable to start thread" + str(e)
         

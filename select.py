@@ -21,7 +21,14 @@ try	:
 except:
     print 'Error: wrong number of features to keep:' + sys.argv[2] + ', give me a number!'
     sys.exit()
-	
+
+threadNum = 1
+try	:
+    if len(sys.argv) == 6:
+        threadNum = int(sys.argv[5])
+except:
+    print 'Error: wrong number of features to keep:' + sys.argv[2] + ', give me a number!'
+    sys.exit()	
 	
 #prepare the data set parameters
 mySet = SampleSet()
@@ -29,15 +36,22 @@ fname = sys.argv[1]
 
 #print mySet.parameters		
 #select metric
-selectors = [FeatureSelector(sys.argv[2], 0), FeatureSelector(sys.argv[2], 1)]
-events = []
-for selector in selectors:
-    events.append(selector.startProcessing(fname))
-    
+import time
+starttime = time.time()
+selectors = []
+for id in range(threadNum):
+    selectors.append(FeatureSelector(sys.argv[2], id, threadNum))
+
+events = map(lambda x: x.startProcessing(fname), selectors)
 map(lambda x:x.wait(), events)
+
 selector = reduce(lambda x, y: x.combine(y), selectors)    
     
 subset = selector.select(int(sys.argv[3]))
+
+endtime = time.time()
+calcdTime = endtime - starttime
+print 'Elapsed time: ' + str(calcdTime)[:-4]
 
 #Persist the subset
 print subset

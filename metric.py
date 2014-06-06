@@ -22,22 +22,19 @@ class Metric(object):
         self._N += other._N
         for target in [0, 1]:
             self._target[target] += other._target[target]
-        print self._freq
-        print self._conj
-        print self._target
         return self
         
-    def _readFile(self, fname, event, id):
-        cnt = 0
+    def _readFile(self, fname, event, id, threadNum):
         with open(fname, 'r') as f:
-            line = f.readline()
-            while line:
-               cnt += 1
-               if cnt % 2 == id:
-                   self.process(line)
-               line = f.readline()
-        
-        print 'in thread!!!'
+            cnt = 0
+            while True:
+                line = f.readline()
+                if not line: break
+                if len(line) < 2: continue
+                if cnt % threadNum == id:
+                    self.process(line)
+                cnt += 1
+        print 'Thread ' + str(id) + ' finished'
         event.set()
     
     def __init__(self):  # pylint: disable=E1002
